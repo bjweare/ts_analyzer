@@ -1,0 +1,32 @@
+#!/bin/sh
+
+CPRJ_DIR=cprj
+
+if [ -d $CPRJ_DIR ]; then
+	SRC_DIR=`pwd`
+elif [ -d ../$CPRJ_DIR ]; then
+	SRC_DIR=`pwd`/../
+else
+	echo can\'t find $CPRJ_DIR directory
+	exit -1
+fi
+
+# TODO: when it's the first time to use this script,
+#		make it possible to decide which directories
+#		should be searched and to record these dire-
+#		ctories in a text file.
+#if [ ] foreach
+
+OUT_DIR=$SRC_DIR/$CPRJ_DIR/
+filelist=$OUT_DIR/$CPRJ_DIR.files
+
+echo $SRC_DIR/config.mak > $filelist 
+
+find $SRC_DIR/include/ -name "*.h" -o -name "*.c" -o -name "Makefile" -o -name "makefile" >> $filelist
+find $SRC_DIR/app/ -name "*.h" -o -name "*.c" -o -name "Makefile" -o -name "makefile" >> $filelist
+find $SRC_DIR/src/ -name "*.h" -o -name "*.c" -o -name "Makefile" -o -name "makefile" >> $filelist
+
+cd $OUT_DIR
+cscope -bkq -i $filelist
+ctags -L $filelist
+cd - > /dev/null
